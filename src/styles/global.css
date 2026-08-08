@@ -1,0 +1,453 @@
+:root {
+  --color-bg: #0b0a08;
+  --color-ivory: #f4f1ea;
+  --color-sand: #cfc6b4;
+  --color-gold: #b9a06a;
+  --color-charcoal: #1a1815;
+  --color-line: rgba(244, 241, 234, 0.14);
+  --font-display: 'Cormorant Garamond', serif;
+  --font-body: 'Inter', sans-serif;
+  --ease-luxury: cubic-bezier(0.22, 1, 0.36, 1);
+  --gutter: clamp(20px, 3.2vw, 56px);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+}
+
+html.lenis {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+::selection {
+  background: var(--color-gold);
+  color: var(--color-charcoal);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(217, 197, 154, 0.35);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.canvas-stage {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+}
+
+.scroll-spacer {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.scroll-spacer section {
+  height: 100vh;
+  width: 100%;
+}
+
+/* ---------------------------------------------------------------------------
+   Overlay shell
+   Three bands (masthead / centre lockup / read-out) on a fixed grid, so the
+   interface frames the 3D gallery instead of floating on top of it.
+---------------------------------------------------------------------------- */
+.hero-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  pointer-events: none;
+}
+
+.hero-overlay a,
+.hero-overlay button {
+  pointer-events: auto;
+}
+
+/* Soft scrim: darkens only the top and bottom edges so the masthead and the
+   read-out stay legible over the bright, fully-lit rooms below. */
+.overlay-veil {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(to bottom, rgba(11, 10, 8, 0.72) 0%, rgba(11, 10, 8, 0.28) 12%, transparent 26%),
+    linear-gradient(to top, rgba(11, 10, 8, 0.78) 0%, rgba(11, 10, 8, 0.32) 11%, transparent 25%);
+}
+
+/* --- Masthead ------------------------------------------------------------ */
+.top-bar {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 24px;
+  padding: clamp(16px, 1.8vw, 26px) var(--gutter);
+  border-bottom: 1px solid rgba(244, 241, 234, 0.08);
+}
+
+.brand-mark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(16px, 1.4vw, 21px);
+  letter-spacing: 0.38em;
+  text-transform: uppercase;
+  color: var(--color-ivory);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: clamp(18px, 2.2vw, 40px);
+}
+
+.nav-link,
+.nav-action {
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-sand);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.4s var(--ease-luxury);
+}
+
+.nav-link:hover {
+  color: var(--color-ivory);
+}
+
+.nav-action {
+  padding: 10px 20px;
+  border: 1px solid var(--color-line);
+  border-radius: 999px;
+  color: var(--color-ivory);
+  transition: background 0.5s var(--ease-luxury), border-color 0.5s var(--ease-luxury),
+    color 0.5s var(--ease-luxury);
+}
+
+.nav-action:hover {
+  background: var(--color-ivory);
+  border-color: var(--color-ivory);
+  color: var(--color-charcoal);
+}
+
+/* --- Centre lockup ------------------------------------------------------- */
+.hero-center {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 4vh, 64px) var(--gutter);
+  transition: opacity 0.3s linear;
+}
+
+/* A wide, very soft pool of shade sitting behind the lockup, so the type never
+   has to fight a brightly-lit wall for contrast. It lives inside .hero-center,
+   which means it fades out together with the copy as you walk in. */
+.hero-center::before {
+  content: '';
+  position: absolute;
+  inset: -34% -12%;
+  background: radial-gradient(
+    60% 58% at 50% 50%,
+    rgba(11, 10, 8, 0.76) 0%,
+    rgba(11, 10, 8, 0.58) 40%,
+    rgba(11, 10, 8, 0.24) 68%,
+    transparent 88%
+  );
+  pointer-events: none;
+}
+
+.hero-lockup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  max-width: 1180px;
+}
+
+/* Every small element in the overlay sits on an unpredictable, sometimes very
+   bright 3D backdrop — this shadow is what guarantees it stays readable. */
+.hero-meta,
+.hero-credits,
+.room-label,
+.room-count,
+.scroll-cue,
+.nav-links,
+.brand-mark {
+  text-shadow: 0 1px 14px rgba(11, 10, 8, 0.9), 0 0 3px rgba(11, 10, 8, 0.55);
+}
+
+.hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--color-sand);
+}
+
+.hero-meta .meta-pill {
+  padding: 6px 14px;
+  border: 1px solid rgba(185, 160, 106, 0.45);
+  border-radius: 999px;
+  background: rgba(11, 10, 8, 0.35);
+  color: #d9c398;
+  letter-spacing: 0.24em;
+}
+
+.hero-meta .meta-dim {
+  color: rgba(244, 241, 234, 0.42);
+}
+
+.hero-title {
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: clamp(46px, 8.4vw, 132px);
+  line-height: 0.98;
+  letter-spacing: -0.015em;
+  margin: clamp(20px, 2.4vw, 34px) 0 0;
+  color: var(--color-ivory);
+  text-wrap: balance;
+  text-shadow: 0 2px 40px rgba(11, 10, 8, 0.7);
+}
+
+.hero-title em {
+  font-style: italic;
+  color: var(--color-ivory);
+}
+
+.hero-credits {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 2.6vw, 44px);
+  margin-top: clamp(24px, 2.8vw, 40px);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(244, 241, 234, 0.82);
+}
+
+.hero-credits .credit {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hero-credits .credit-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  opacity: 0.75;
+}
+
+/* --- Bottom read-out ----------------------------------------------------- */
+.bottom-bar {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: clamp(18px, 2vw, 30px) var(--gutter) clamp(24px, 2.6vw, 38px);
+}
+
+.room-status {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  min-height: 42px;
+}
+
+.room-count {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 2.2vw, 34px);
+  font-weight: 300;
+  line-height: 1;
+  color: var(--color-gold);
+}
+
+.room-count-total {
+  font-size: 0.5em;
+  letter-spacing: 0.08em;
+  color: rgba(244, 241, 234, 0.35);
+  margin-left: 2px;
+}
+
+.room-label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-ivory);
+}
+
+.room-label em {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: rgba(244, 241, 234, 0.45);
+}
+
+.scroll-cue {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 12px;
+  color: var(--color-sand);
+  font-size: 10px;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.scroll-cue .line {
+  width: 1px;
+  height: 40px;
+  background: linear-gradient(to bottom, rgba(185, 160, 106, 0.7), transparent);
+  overflow: hidden;
+  position: relative;
+}
+
+/* --- Hairline progress rail ---------------------------------------------- */
+.progress-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: rgba(244, 241, 234, 0.08);
+}
+
+.progress-rail-fill {
+  height: 100%;
+  background: linear-gradient(to right, rgba(185, 160, 106, 0.4), var(--color-gold));
+  transform-origin: left;
+  transition: transform 0.15s linear;
+}
+
+.scroll-cue .line::after {
+  content: '';
+  position: absolute;
+  top: -100%;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--color-ivory);
+  animation: scrollDrip 2.4s var(--ease-luxury) infinite;
+}
+
+@keyframes scrollDrip {
+  0% {
+    top: -100%;
+  }
+  60% {
+    top: 100%;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+.loading-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  background: var(--color-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.loading-mark {
+  font-family: var(--font-display);
+  letter-spacing: 0.4em;
+  font-size: 14px;
+  text-transform: uppercase;
+  color: var(--color-sand);
+}
+
+.loading-bar {
+  width: 200px;
+  height: 1px;
+  background: rgba(244, 241, 234, 0.15);
+  overflow: hidden;
+}
+
+.loading-bar-fill {
+  height: 100%;
+  background: var(--color-gold);
+  transform-origin: left;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue .line::after {
+    animation: none;
+  }
+}
+
+/* Tablet: the masthead sheds its plain links and keeps only the action. */
+@media (max-width: 900px) {
+  .nav-link {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-title {
+    font-size: clamp(38px, 11vw, 64px);
+  }
+  .hero-meta {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    font-size: 10px;
+  }
+  /* The qualifier is the first thing to go when the row gets tight. */
+  .hero-meta .meta-dim {
+    display: none;
+  }
+  .hero-credits {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .room-label em,
+  .scroll-cue span {
+    display: none;
+  }
+  .bottom-bar {
+    align-items: center;
+  }
+}

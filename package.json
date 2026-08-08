@@ -1,0 +1,32 @@
+{
+  "name": "luxury-gallery-hero",
+  "private": true,
+  "version": "1.1.0",
+  "type": "module",
+  "description": "An original cinematic 3D hero section for a luxury fine-art e-commerce site — a multi-room gallery walkthrough. Built with React, React Three Fiber, GSAP-ready structure, Framer Motion and Lenis.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint src"
+  },
+  "dependencies": {
+    "@react-three/drei": "^9.109.0",
+    "@react-three/fiber": "^8.16.8",
+    "@react-three/postprocessing": "^2.16.2",
+    "framer-motion": "^11.3.19",
+    "gsap": "^3.12.5",
+    "lenis": "^1.1.6",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.166.1",
+    "zustand": "^4.5.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "eslint": "^8.57.0",
+    "vite": "^5.3.4"
+  }
+}

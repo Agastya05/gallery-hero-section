@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "WebFetch(domain:zigguratss.com)",
+      "Bash(npx eslint *)",
+      "Bash(npm run *)",
+      "Bash(gh auth *)",
+      "Bash(git --version)",
+      "Bash(git config *)",
+      "Bash(ssh -T git@github.com)"
+    ]
+  }
+}
