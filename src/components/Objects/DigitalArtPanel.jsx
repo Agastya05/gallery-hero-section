@@ -20,34 +20,45 @@ export default function DigitalArtPanel({
   rotation = [0, 0, 0],
   height = 1.0,
   glow = '#8fc7dd',
+  onPointerEnter,
 }) {
   const materialRef = useRef();
 
   const texture = useTexture(artwork.src);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  texture.anisotropy = 16;
+
+  const textureAspect = useMemo(() => {
+    const image = texture.image;
+    const width = image?.naturalWidth || image?.videoWidth || image?.width;
+    const height = image?.naturalHeight || image?.videoHeight || image?.height;
+    return width && height ? width / height : artwork.aspect;
+  }, [texture.image, artwork.aspect]);
 
   // Plaque with the real credit line, matching the framed rooms.
   const plaqueTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 128;
+    canvas.width = 640;
+    canvas.height = 154;
     const ctx = canvas.getContext('2d');
     ctx.fillStyle = '#22252b';
-    ctx.fillRect(0, 0, 512, 128);
+    ctx.fillRect(0, 0, 640, 154);
+    ctx.strokeStyle = 'rgba(232,237,242,0.2)';
+    ctx.lineWidth = 4;
+    ctx.strokeRect(10, 10, 620, 134);
     ctx.textAlign = 'center';
 
     ctx.fillStyle = '#e8edf2';
-    let titleSize = 32;
+    let titleSize = 38;
     do {
       ctx.font = `500 ${titleSize}px Georgia, serif`;
       titleSize -= 2;
-    } while (ctx.measureText(artwork.title).width > 468 && titleSize > 16);
-    ctx.fillText(artwork.title, 256, 52);
+    } while (ctx.measureText(artwork.title).width > 572 && titleSize > 18);
+    ctx.fillText(artwork.title, 320, 62);
 
-    ctx.font = 'italic 300 24px Georgia, serif';
+    ctx.font = 'italic 300 29px Georgia, serif';
     ctx.fillStyle = '#9fb0bd';
-    ctx.fillText(`${artwork.artist} · ${artwork.medium}`, 256, 92);
+    ctx.fillText(`${artwork.artist} · ${artwork.medium}`, 320, 106);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -62,13 +73,18 @@ export default function DigitalArtPanel({
   });
 
   const h = height;
-  const w = height * artwork.aspect;
+  const w = height * textureAspect;
 
   return (
-    <group position={position} rotation={rotation}>
+    <group position={position} rotation={rotation} onPointerEnter={onPointerEnter}>
+      <mesh position={[0.035, -0.035, -0.006]}>
+        <planeGeometry args={[w + 0.16, h + 0.16]} />
+        <meshBasicMaterial color="#0d1117" transparent opacity={0.28} depthWrite={false} />
+      </mesh>
+
       {/* Thin bezel */}
       <mesh castShadow>
-        <boxGeometry args={[w + 0.07, h + 0.07, 0.05]} />
+        <boxGeometry args={[w + 0.1, h + 0.1, 0.055]} />
         <meshStandardMaterial color="#3c3a38" roughness={0.45} metalness={0.5} />
       </mesh>
 
@@ -85,8 +101,8 @@ export default function DigitalArtPanel({
         />
       </mesh>
 
-      <mesh position={[0, -h / 2 - 0.17, 0.03]}>
-        <planeGeometry args={[0.5, 0.125]} />
+      <mesh position={[0, -h / 2 - 0.2, 0.03]}>
+        <planeGeometry args={[0.72, 0.174]} />
         <meshStandardMaterial map={plaqueTexture} roughness={0.6} />
       </mesh>
 
