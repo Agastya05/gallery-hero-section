@@ -36,7 +36,7 @@ export default function HeroOverlay() {
   const activeChapter = useScrollStore((s) => s.activeChapter);
 
   const room = ROOMS[activeChapter] ?? ROOMS[0];
-  const introOpacity = Math.max(0, 1 - progress / 0.16);
+  const introOpacity = Math.max(0, 1 - progress / 0.055);
 
   return (
     <div className="hero-overlay">
@@ -110,8 +110,8 @@ export default function HeroOverlay() {
         <motion.div
           className="scroll-cue"
           initial={{ opacity: 0 }}
-          animate={{ opacity: progress < 0.04 ? 1 : 0 }}
-          transition={{ duration: 0.6, delay: progress < 0.04 ? 1.1 : 0 }}
+          animate={{ opacity: progress < 0.025 ? 1 : 0 }}
+          transition={{ duration: 0.45, delay: progress < 0.025 ? 0.85 : 0 }}
         >
           <span>Scroll to enter</span>
           <div className="line" />

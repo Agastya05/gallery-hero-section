@@ -20,6 +20,16 @@ import * as THREE from 'three';
  * hand-authoring a huge, brittle waypoint list.
  */
 
+const SIDE_WALL_LOOK_X = 5.35;
+const SIDE_WALL_ART_Z_OFFSET = 1.05;
+const FAR_WALL_ART_Z_OFFSET = 0.15;
+const FAR_WALL_PANEL_X = 3.55;
+const ART_LOOK_Y = 2.15;
+const featureX = (room) =>
+  room.index < ROOMS.length - 1 ? -room.side * FAR_WALL_PANEL_X : 0;
+const sideArtworkZ = (side, room) =>
+  room.zCenter + (side < 0 ? SIDE_WALL_ART_Z_OFFSET : -SIDE_WALL_ART_Z_OFFSET);
+
 function buildStations() {
   const stations = [
     // Starting pose, a little back from the first room's entrance.
@@ -27,18 +37,31 @@ function buildStations() {
   ];
 
   ROOMS.forEach((room) => {
-    const { side } = room; // alternates per room — see roomsConfig
-    // Entering the room: camera drifts slightly toward one side wall.
+    const firstSide = room.id === 'sculpture' ? -1 : room.side;
+    const oppositeSide = -firstSide;
+    const roomFov = room.dark ? 40 : 43;
+
+    // Enter the room looking toward the first wall-mounted artwork.
     stations.push({
-      pos: [side * 1.6, 1.65, room.zStart - 1.2],
-      look: [side * 0.9, 1.5, room.zCenter],
-      fov: room.dark ? 36 : 39,
+      pos: [oppositeSide * 0.85, 1.65, room.zStart - 1.15],
+      look: [firstSide * SIDE_WALL_LOOK_X, ART_LOOK_Y, sideArtworkZ(firstSide, room)],
+      fov: roomFov,
     });
-    // Center of the room: camera straightens up to take in the whole space.
+
+    if (room.id !== 'finale' && room.id !== 'sculpture') {
+      // Mid-room pan: cross the view to the opposite wall before revealing
+      // the far-wall feature, so the scroll pass shows the whole room.
+      stations.push({
+        pos: [firstSide * 0.9, 1.58, room.zCenter + 0.25],
+        look: [oppositeSide * SIDE_WALL_LOOK_X, ART_LOOK_Y, sideArtworkZ(oppositeSide, room)],
+        fov: room.dark ? 39 : 42,
+      });
+    }
+
     stations.push({
-      pos: [side * -0.6, 1.55, room.zCenter],
-      look: [side * -0.3, 1.45, room.zEnd],
-      fov: room.dark ? 34 : 37,
+      pos: [firstSide * 0.25, 1.58, room.zEnd + 2.45],
+      look: [featureX(room), ART_LOOK_Y, room.zEnd + FAR_WALL_ART_Z_OFFSET],
+      fov: room.dark ? 39 : 42,
     });
   });
 

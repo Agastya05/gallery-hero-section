@@ -32,6 +32,7 @@ export default function ArtworkFrame({
   depthFactor = 0.15,
   frameColor = '#4b443b',
   mountColor = '#efe9dc',
+  onPointerEnter,
 }) {
   const groupRef = useRef();
   const progress = useScrollStore((s) => s.progress);
@@ -39,36 +40,46 @@ export default function ArtworkFrame({
 
   const texture = useTexture(artwork.src);
   texture.colorSpace = THREE.SRGBColorSpace;
-  texture.anisotropy = 8;
+  texture.anisotropy = 16;
+
+  const textureAspect = useMemo(() => {
+    const image = texture.image;
+    const width = image?.naturalWidth || image?.videoWidth || image?.width;
+    const height = image?.naturalHeight || image?.videoHeight || image?.height;
+    return width && height ? width / height : artwork.aspect;
+  }, [texture.image, artwork.aspect]);
 
   // Wall plaque: title, artist, medium — the same information the piece
   // carries on its catalogue page.
   const plaqueTexture = useMemo(() => {
     const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 160;
+    canvas.width = 640;
+    canvas.height = 190;
     const ctx = canvas.getContext('2d');
 
     ctx.fillStyle = '#f2ede0';
-    ctx.fillRect(0, 0, 512, 160);
+    ctx.fillRect(0, 0, 640, 190);
+    ctx.strokeStyle = 'rgba(42,37,29,0.18)';
+    ctx.lineWidth = 5;
+    ctx.strokeRect(10, 10, 620, 170);
 
     // Titles vary a lot in length; shrink to fit rather than overflow.
     ctx.textAlign = 'center';
     ctx.fillStyle = '#2a251d';
-    let titleSize = 34;
+    let titleSize = 40;
     do {
       ctx.font = `500 ${titleSize}px Georgia, serif`;
       titleSize -= 2;
-    } while (ctx.measureText(artwork.title).width > 468 && titleSize > 16);
-    ctx.fillText(artwork.title, 256, 56);
+    } while (ctx.measureText(artwork.title).width > 572 && titleSize > 18);
+    ctx.fillText(artwork.title, 320, 67);
 
-    ctx.font = 'italic 300 26px Georgia, serif';
+    ctx.font = 'italic 300 31px Georgia, serif';
     ctx.fillStyle = '#5c5445';
-    ctx.fillText(artwork.artist, 256, 96);
+    ctx.fillText(artwork.artist, 320, 116);
 
-    ctx.font = '300 21px Arial, sans-serif';
+    ctx.font = '300 25px Arial, sans-serif';
     ctx.fillStyle = '#8a8172';
-    ctx.fillText(artwork.medium, 256, 130);
+    ctx.fillText(artwork.medium, 320, 154);
 
     const tex = new THREE.CanvasTexture(canvas);
     tex.colorSpace = THREE.SRGBColorSpace;
@@ -94,12 +105,17 @@ export default function ArtworkFrame({
   });
 
   const h = height;
-  const w = height * artwork.aspect;
-  const mount = 0.07; // ivory mount board visible around the image
-  const lip = 0.05; // frame moulding beyond the mount
+  const w = height * textureAspect;
+  const mount = 0.085; // ivory mount board visible around the image
+  const lip = 0.065; // frame moulding beyond the mount
 
   return (
-    <group ref={groupRef} position={position} rotation={rotation}>
+    <group ref={groupRef} position={position} rotation={rotation} onPointerEnter={onPointerEnter}>
+      <mesh position={[0.035, -0.035, -0.006]} receiveShadow>
+        <planeGeometry args={[w + (mount + lip) * 2.18, h + (mount + lip) * 2.18]} />
+        <meshBasicMaterial color="#1e1a14" transparent opacity={0.18} depthWrite={false} />
+      </mesh>
+
       {/* Frame moulding */}
       <mesh castShadow receiveShadow>
         <boxGeometry args={[w + (mount + lip) * 2, h + (mount + lip) * 2, 0.06]} />
@@ -112,6 +128,11 @@ export default function ArtworkFrame({
         <meshStandardMaterial color={mountColor} roughness={0.95} metalness={0} />
       </mesh>
 
+      <mesh position={[0, 0, 0.033]}>
+        <planeGeometry args={[w + 0.025, h + 0.025]} />
+        <meshBasicMaterial color="#231f19" transparent opacity={0.14} />
+      </mesh>
+
       {/* The work itself */}
       <mesh position={[0, 0, 0.034]}>
         <planeGeometry args={[w, h]} />
@@ -119,8 +140,8 @@ export default function ArtworkFrame({
       </mesh>
 
       {/* Museum plaque, hung just below the frame */}
-      <mesh position={[0, -h / 2 - mount - lip - 0.15, 0.032]}>
-        <planeGeometry args={[0.5, 0.156]} />
+      <mesh position={[0, -h / 2 - mount - lip - 0.18, 0.032]}>
+        <planeGeometry args={[0.72, 0.214]} />
         <meshStandardMaterial map={plaqueTexture} roughness={0.65} />
       </mesh>
     </group>
